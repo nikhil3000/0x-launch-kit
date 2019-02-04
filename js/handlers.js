@@ -38,6 +38,8 @@ exports.handlers = {
         res.status(HttpStatus.OK).send(assetPairs);
     },
     ordersAsync: async (req, res) => {
+        console.log("get order");
+        console.log(req);
         utils_1.utils.validateSchema(req.query, json_schemas_1.schemas.ordersRequestOptsSchema);
         const { page, perPage } = parsePaginationConfig(req);
         const paginatedOrders = await orderbook_1.orderBook.getOrdersAsync(page, perPage, req.query);
@@ -81,14 +83,21 @@ exports.handlers = {
         res.status(HttpStatus.OK).send(orderConfigResponse);
     },
     postOrderAsync: async (req, res) => {
-        utils_1.utils.validateSchema(req.body, json_schemas_1.schemas.signedOrderSchema);
-        const signedOrder = unmarshallOrder(req.body);
-        if (config_1.WHITELISTED_TOKENS !== '*') {
-            const allowedTokens = config_1.WHITELISTED_TOKENS;
-            validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.makerAssetData, 'makerAssetData');
-            validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.takerAssetData, 'takerAssetData');
-        }
-        await orderbook_1.orderBook.addOrderAsync(signedOrder);
+        console.log("post order");
+        utils_1.utils.validateSchema(req.body.order, json_schemas_1.schemas.signedOrderSchema);
+        console.log("validated");
+        const signedOrder = unmarshallOrder(req.body.order);
+        console.log(signedOrder);
+        // if (config_1.WHITELISTED_TOKENS !== '*') {
+        //     const allowedTokens = config_1.WHITELISTED_TOKENS;
+        //     validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.takerAssetData, 'takerAssetData');
+        //     console.log("abc");            
+        //     validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.makerAssetData, 'makerAssetData');
+        
+        // }
+        console.log("crossed if");
+        await orderbook_1.orderBook.addOrderAsync(signedOrder,req.body.strike);
+        console.log("supposedely added to orderbook");
         res.status(HttpStatus.OK).send();
     },
     getOrderByHashAsync: async (req, res) => {
@@ -102,11 +111,14 @@ exports.handlers = {
 };
 function validateAssetDataIsWhitelistedOrThrow(allowedTokens, assetData, field) {
     const decodedAssetData = _0x_js_1.assetDataUtils.decodeAssetDataOrThrow(assetData);
+    console.log("data decoded");
     if (_0x_js_1.assetDataUtils.isMultiAssetData(decodedAssetData)) {
+        console.log("inside if");
         for (const [, nestedAssetDataElement] of decodedAssetData.nestedAssetData.entries()) {
             validateAssetDataIsWhitelistedOrThrow(allowedTokens, nestedAssetDataElement, field);
         }
     } else {
+        console.log("inside else");
         if (!_.includes(allowedTokens, decodedAssetData.tokenAddress)) {
             throw new errors_1.ValidationError([
                 {

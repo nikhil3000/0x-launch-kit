@@ -17,6 +17,7 @@ class SignedOrderModel {
         this.takerAssetAmount = opts.takerAssetAmount;
         this.salt = opts.salt;
         this.signature = opts.signature;
+        this.strikePrice = opts.strikePrice;
     }
 }
 exports.SignedOrderModel = SignedOrderModel;

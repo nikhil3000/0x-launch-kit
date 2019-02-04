@@ -41,9 +41,10 @@ exports.orderBook = {
             await connection.manager.delete(SignedOrderModel_1.SignedOrderModel, permanentlyExpiredOrders);
         }
     },
-    addOrderAsync: async signedOrder => {
+    addOrderAsync: async (signedOrder,strike) => {
         await orderWatcher.addOrderAsync(signedOrder);
-        const signedOrderModel = serializeOrder(signedOrder);
+        const signedOrderModel = serializeOrder(signedOrder,strike);
+        console.log(signedOrderModel);
         const connection = db_connection_1.getDBConnection();
         await connection.manager.save(signedOrderModel);
     },
@@ -232,10 +233,11 @@ const deserializeOrder = signedOrderModel => {
         exchangeAddress: signedOrderModel.exchangeAddress,
         feeRecipientAddress: signedOrderModel.feeRecipientAddress,
         expirationTimeSeconds: new _0x_js_1.BigNumber(signedOrderModel.expirationTimeSeconds),
+        strikePrice:signedOrderModel.strikePrice,
     };
     return signedOrder;
 };
-const serializeOrder = signedOrder => {
+const serializeOrder = (signedOrder, strikePrice)=> {
     const signedOrderModel = new SignedOrderModel_1.SignedOrderModel({
         signature: signedOrder.signature,
         senderAddress: signedOrder.senderAddress,
@@ -252,6 +254,7 @@ const serializeOrder = signedOrder => {
         feeRecipientAddress: signedOrder.feeRecipientAddress,
         expirationTimeSeconds: signedOrder.expirationTimeSeconds.toNumber(),
         hash: _0x_js_1.orderHashUtils.getOrderHashHex(signedOrder),
+        strikePrice: strikePrice,
     });
     return signedOrderModel;
 };
