@@ -54,7 +54,20 @@ exports.signedOrderEntity = new typeorm_1.EntitySchema({
         },
         strikePrice: {
             type: 'int',
-        }
+        },
+        baseToken:{
+            type:'int',
+        },
+        quoteToken: {
+            type:'int',
+        },
+        numberOfBaseToken: {
+            type:'int',
+        },
+        premium:{
+            type:'int',
+        },
+
         
     },
 });

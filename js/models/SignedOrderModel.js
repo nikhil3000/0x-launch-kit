@@ -18,6 +18,10 @@ class SignedOrderModel {
         this.salt = opts.salt;
         this.signature = opts.signature;
         this.strikePrice = opts.strikePrice;
-    }
+        this.baseToken = opts.baseToken;
+        this.quoteToken = opts.quoteToken;
+        this.numberOfBaseToken = opts.numberOfBaseToken;
+        this.premium = opts.premium;
+    } 
 }
 exports.SignedOrderModel = SignedOrderModel;

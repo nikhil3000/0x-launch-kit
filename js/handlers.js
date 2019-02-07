@@ -39,7 +39,6 @@ exports.handlers = {
     },
     ordersAsync: async (req, res) => {
         console.log("get order");
-        console.log(req);
         utils_1.utils.validateSchema(req.query, json_schemas_1.schemas.ordersRequestOptsSchema);
         const { page, perPage } = parsePaginationConfig(req);
         const paginatedOrders = await orderbook_1.orderBook.getOrdersAsync(page, perPage, req.query);
@@ -84,10 +83,11 @@ exports.handlers = {
     },
     postOrderAsync: async (req, res) => {
         console.log("post order");
+        // console.log(req.body);
         utils_1.utils.validateSchema(req.body.order, json_schemas_1.schemas.signedOrderSchema);
         console.log("validated");
         const signedOrder = unmarshallOrder(req.body.order);
-        console.log(signedOrder);
+        // console.log(signedOrder);
         // if (config_1.WHITELISTED_TOKENS !== '*') {
         //     const allowedTokens = config_1.WHITELISTED_TOKENS;
         //     validateAssetDataIsWhitelistedOrThrow(allowedTokens, signedOrder.takerAssetData, 'takerAssetData');
@@ -96,7 +96,7 @@ exports.handlers = {
         
         // }
         console.log("crossed if");
-        await orderbook_1.orderBook.addOrderAsync(signedOrder,req.body.strike);
+        await orderbook_1.orderBook.addOrderAsync(signedOrder,req.body.extra);
         console.log("supposedely added to orderbook");
         res.status(HttpStatus.OK).send();
     },

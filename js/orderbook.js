@@ -41,10 +41,10 @@ exports.orderBook = {
             await connection.manager.delete(SignedOrderModel_1.SignedOrderModel, permanentlyExpiredOrders);
         }
     },
-    addOrderAsync: async (signedOrder,strike) => {
+    addOrderAsync: async (signedOrder,extra) => {
         await orderWatcher.addOrderAsync(signedOrder);
-        const signedOrderModel = serializeOrder(signedOrder,strike);
-        console.log(signedOrderModel);
+        const signedOrderModel = serializeOrder(signedOrder,extra);
+        // console.log(signedOrderModel);
         const connection = db_connection_1.getDBConnection();
         await connection.manager.save(signedOrderModel);
     },
@@ -233,11 +233,15 @@ const deserializeOrder = signedOrderModel => {
         exchangeAddress: signedOrderModel.exchangeAddress,
         feeRecipientAddress: signedOrderModel.feeRecipientAddress,
         expirationTimeSeconds: new _0x_js_1.BigNumber(signedOrderModel.expirationTimeSeconds),
-        strikePrice:signedOrderModel.strikePrice,
+        strikePrice:signedOrderModel.strikePrice, 
+        baseToken:signedOrderModel.baseToken,
+        quoteToken:signedOrderModel.quoteToken,
+        numberOfBaseToken:signedOrderModel.numberOfBaseToken,
+        premium:signedOrderModel.premium
     };
     return signedOrder;
 };
-const serializeOrder = (signedOrder, strikePrice)=> {
+const serializeOrder = (signedOrder, extra)=> {
     const signedOrderModel = new SignedOrderModel_1.SignedOrderModel({
         signature: signedOrder.signature,
         senderAddress: signedOrder.senderAddress,
@@ -254,7 +258,12 @@ const serializeOrder = (signedOrder, strikePrice)=> {
         feeRecipientAddress: signedOrder.feeRecipientAddress,
         expirationTimeSeconds: signedOrder.expirationTimeSeconds.toNumber(),
         hash: _0x_js_1.orderHashUtils.getOrderHashHex(signedOrder),
-        strikePrice: strikePrice,
+        strikePrice: extra.strikePrice,
+        baseToken: extra.baseToken,
+        quoteToken: extra.quoteToken,
+        numberOfBaseToken:extra.numberOfBaseTokens,
+        premium:extra.premium
+
     });
     return signedOrderModel;
 };
